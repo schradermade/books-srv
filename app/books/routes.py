@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path, Query
 from .helpers import next_book_id
 from .models import Book, BookRequest
 from .db import BOOKS
@@ -20,7 +20,8 @@ async def read_book(book_id: int = Path(gt=0)):
 
 # books by publish_date
 @app.get('/books/publish/')
-async def read_books_by_publish_date(published_date: datetime):
+async def read_books_by_publish_date(
+    published_date: datetime = Query(lt=datetime.now())):
     books_to_return = []
     for book in BOOKS:
         if book.published_date == published_date:
@@ -38,7 +39,7 @@ async def create_book(book_request: BookRequest):
 
 # books by rating
 @app.get('/books/')
-async def read_book_by_rating(book_rating: int):
+async def read_book_by_rating(book_rating: int = Query(gt=0, lt=6)):
     books_to_return = []
 
     for book in BOOKS:
