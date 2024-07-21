@@ -37,3 +37,9 @@ async def read_book_by_rating(book_rating: int):
 
     return books_to_return
 
+# update a book
+@app.put('/book/update_book')
+async def update_book(book: BookRequest):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book.id:
+            BOOKS[i] = book
