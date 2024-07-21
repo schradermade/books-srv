@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import FastAPI
 from .helpers import next_book_id
 from .models import Book, BookRequest
@@ -16,6 +17,15 @@ async def read_book(book_id: int):
     for book in BOOKS:
         if book.id == book_id:
             return book
+
+# books by publish_date
+@app.get('/books/publish/')
+async def read_books_by_publish_date(published_date: datetime):
+    books_to_return = []
+    for book in BOOKS:
+        if book.published_date == published_date:
+            books_to_return.append(book)
+    return books_to_return
 
 # new book
 @app.post('/create_book')
@@ -43,3 +53,11 @@ async def update_book(book: BookRequest):
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book.id:
             BOOKS[i] = book
+
+# delete a book
+@app.delete('/books/{book_id}')
+async def delete_book(book_id: int):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book_id:
+            deleted_book = BOOKS.pop(i)
+            return deleted_book
