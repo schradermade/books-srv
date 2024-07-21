@@ -1,14 +1,24 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 
-class Book(BaseModel):
+class BaseBook(BaseModel):
+    published_date: datetime = Field(default_factory=datetime.now)
+
+    @field_validator('published_date')
+    def check_published_date(cls, value):
+        if value >= datetime.now():
+            raise ValueError('Published date must be in the past')
+        return value
+
+class Book(BaseBook):
     id: int
     title: str
     author: str
     description: str
     rating: int
 
-class BookRequest(BaseModel):
+class BookRequest(BaseBook):
     id: Optional[int] = Field(description='ID is not needed on create', default=None)
     title: str = Field(min_length=3)
     author: str = Field(min_length=1)
@@ -21,7 +31,8 @@ class BookRequest(BaseModel):
               "title": "A new book",
               "author": "Nathan S",
               "description": "A new description of a book",
-              "rating": 5
+              "rating": 5,
+              "published_date": str(datetime.now().date())
           }
       }
     }
